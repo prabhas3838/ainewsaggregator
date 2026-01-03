@@ -1,0 +1,158 @@
+import os
+import json
+import re
+from datetime import datetime
+from typing import List, Optional
+from groq import Groq
+from pydantic import BaseModel, Field, ValidationError
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+# -------------------- Models --------------------
+
+class EmailIntroduction(BaseModel):
+    greeting: str
+    introduction: str
+
+
+class RankedArticleDetail(BaseModel):
+    digest_id: str
+    rank: int
+    relevance_score: int
+    title: str
+    summary: str
+    url: str
+    article_type: str
+    reasoning: Optional[str] = None
+
+
+class EmailDigestResponse(BaseModel):
+    introduction: EmailIntroduction
+    articles: List[RankedArticleDetail]
+    total_ranked: int
+    top_n: int
+
+    def to_markdown(self) -> str:
+        md = f"{self.introduction.greeting}\n\n"
+        md += f"{self.introduction.introduction}\n\n"
+        md += "---\n\n"
+
+        for article in self.articles:
+            md += f"## {article.title}\n\n"
+            md += f"{article.summary}\n\n"
+            md += f"[Read more →]({article.url})\n\n"
+            md += "---\n\n"
+
+        return md
+
+
+# -------------------- Prompt --------------------
+
+SYSTEM_PROMPT = """
+You are an AI system that writes email introductions for AI news digests.
+
+STRICT RULES:
+- Output MUST be valid JSON only
+- Do NOT include markdown or extra text
+- Do NOT wrap output in code blocks
+
+JSON schema:
+{
+  "greeting": "string",
+  "introduction": "string"
+}
+
+Guidelines:
+- Greet the user by name
+- Include the current date
+- Introduction must be 2–3 sentences
+- Professional, warm, concise tone
+"""
+
+
+# -------------------- Utilities --------------------
+
+def extract_json(text: str) -> dict:
+    match = re.search(r"\{.*\}", text, re.DOTALL)
+    if not match:
+        raise ValueError("No JSON found in model output")
+    return json.loads(match.group())
+
+
+# -------------------- Email Agent --------------------
+
+class EmailAgent:
+    def __init__(self, user_profile: dict):
+        self.client = Groq(api_key="GROQ_API_KEY")
+        self.model = "llama-3.1-8b-instant"
+        self.user_profile = user_profile
+
+    def generate_introduction(
+        self,
+        ranked_articles: List[RankedArticleDetail]
+    ) -> EmailIntroduction:
+
+        current_date = datetime.now().strftime('%B %d, %Y')
+
+        if not ranked_articles:
+            return EmailIntroduction(
+                greeting=f"Hey {self.user_profile['name']}, here is your daily AI digest for {current_date}.",
+                introduction="No articles were ranked today."
+            )
+
+        article_preview = "\n".join(
+            f"{a.rank}. {a.title} (Score: {a.relevance_score}/10)"
+            for a in ranked_articles[:10]
+        )
+
+        user_prompt = f"""
+Create an email introduction for {self.user_profile['name']}.
+
+Date: {current_date}
+
+Top ranked articles:
+{article_preview}
+"""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+                temperature=0.6,
+            )
+
+            raw_text = response.choices[0].message.content
+            data = extract_json(raw_text)
+            return EmailIntroduction(**data)
+
+        except (json.JSONDecodeError, ValidationError, ValueError) as e:
+            print("❌ Failed to parse email introduction")
+            print("RAW OUTPUT:\n", raw_text)
+            print("ERROR:", e)
+
+            return EmailIntroduction(
+                greeting=f"Hey {self.user_profile['name']}, here is your daily AI digest for {current_date}.",
+                introduction="Here are the top AI articles curated for you today."
+            )
+
+    def create_email_digest_response(
+        self,
+        ranked_articles: List[RankedArticleDetail],
+        total_ranked: int,
+        limit: int = 10
+    ) -> EmailDigestResponse:
+
+        top_articles = ranked_articles[:limit]
+        introduction = self.generate_introduction(top_articles)
+
+        return EmailDigestResponse(
+            introduction=introduction,
+            articles=top_articles,
+            total_ranked=total_ranked,
+            top_n=limit
+        )
