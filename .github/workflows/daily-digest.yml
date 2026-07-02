@@ -34,4 +34,5 @@ jobs:
         PROXY_PASSWORD: ${{ secrets.PROXY_PASSWORD }}
         USE_SQLITE: "true"
       run: |
+        python app/database/createtables.py
         python main.py

@@ -6,6 +6,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_database_url() -> str:
+    use_sqlite = os.getenv("USE_SQLITE", "true").lower() == "true"
+    if use_sqlite:
+        return "sqlite:///./metadata.db"
+    
     user = os.getenv("POSTGRES_USER", "postgres")
     password = os.getenv("POSTGRES_PASSWORD", "postgres")
     host = os.getenv("POSTGRES_HOST", "localhost")
