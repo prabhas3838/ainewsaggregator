@@ -18,7 +18,7 @@ def main():
     # Step 1: Run scrappers to fetch new articles and videos
     logger.info("Step 1/5: Running scrappers...")
     try:
-        results = run_scrappers(hours=24)
+        results = run_scrappers(hours=150)
         logger.info(f"Scraped {len(results['youtube'])} YouTube videos, {len(results['openai'])} OpenAI articles, and {len(results['anthropic'])} Anthropic articles.")
     except Exception as e:
         logger.error(f"Error in running scrappers: {e}")
@@ -51,7 +51,7 @@ def main():
     logger.info("Step 5/5: Generating and sending email digest...")
     email_success = False
     try:
-        email_results = send_digest_email(hours=24, top_n=10)
+        email_results = send_digest_email(hours=150, top_n=10)
         if email_results.get("success"):
             logger.info(f"Email sent successfully! Subject: {email_results['subject']} | Articles: {email_results['articles_count']}")
             email_success = True

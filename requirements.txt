@@ -1,0 +1,8 @@
+groq
+pydantic
+feedparser
+docling
+youtube-transcript-api
+python-dotenv
+SQLAlchemy
+markdown
