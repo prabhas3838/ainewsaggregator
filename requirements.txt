@@ -1,7 +1,9 @@
 groq
 pydantic
 feedparser
-docling
+beautifulsoup4
+requests
+markdownify
 youtube-transcript-api
 python-dotenv
 SQLAlchemy
