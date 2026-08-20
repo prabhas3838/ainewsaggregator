@@ -75,7 +75,7 @@ def extract_json(text: str) -> dict:
 class CuratorAgent:
     def __init__(self, user_profile: dict):
         self.client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-        self.model = "llama3-8b-8192"
+        self.model = "qwen/qwen3.6-27b"
         self.user_profile = user_profile
         self.system_prompt = self._build_system_prompt()
 
