@@ -63,6 +63,7 @@ class DigestAgent:
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.7,
+                response_format={"type": "json_object"}
             )
 
             raw_text = response.choices[0].message.content
@@ -77,7 +78,8 @@ class DigestAgent:
             return DigestOutput(**data)
 
         except (json.JSONDecodeError, ValidationError, ValueError) as e:
-            print("Failed to parse model output:", e)
+            print(f"Failed to parse model output. Error: {e}")
+            print(f"RAW MODEL OUTPUT WAS:\n{raw_text}")
             return None
         except Exception as e:
             print(f"Error generating digest: {e}")

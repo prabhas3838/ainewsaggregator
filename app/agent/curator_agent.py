@@ -122,6 +122,7 @@ Rank the following {len(digests)} AI digests based on the user profile.
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.3,
+                response_format={"type": "json_object"}
             )
 
             raw_text = response.choices[0].message.content

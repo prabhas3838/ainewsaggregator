@@ -124,6 +124,7 @@ Top ranked articles:
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.6,
+                response_format={"type": "json_object"}
             )
 
             raw_text = response.choices[0].message.content
