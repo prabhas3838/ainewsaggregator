@@ -13,7 +13,7 @@ load_dotenv()
 
 class RankedArticle(BaseModel):
     digest_id: str = Field(description="The ID of the digest (article_type:article_id)")
-    relevance_score: float = Field(ge=0.0, le=10.0)
+    relevance_score: float = Field(ge=0.0, le=100.0)
     rank: int = Field(ge=1)
     reasoning: str
 
