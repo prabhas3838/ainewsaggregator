@@ -30,6 +30,7 @@ STRICT RULES:
 - Output MUST be valid JSON only
 - Do NOT include markdown, explanations, or extra text
 - Do NOT wrap output in code blocks
+- CRITICAL: DO NOT output any reasoning, chain of thought, or <think> tags. Output ONLY the raw JSON immediately.
 
 SCORING RULES (MANDATORY):
 - relevance_score is an INTEGER from 1 to 100
@@ -124,6 +125,7 @@ Rank the following {len(digests)} AI digests based on the user profile.
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.3,
+                response_format={"type": "json_object"}
             )
 
             raw_text = response.choices[0].message.content

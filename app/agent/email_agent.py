@@ -69,6 +69,7 @@ Guidelines:
 - Include the current date
 - Introduction must be 2–3 sentences
 - Professional, warm, concise tone
+- CRITICAL: DO NOT output any reasoning, chain of thought, or <think> tags. Output ONLY the raw JSON immediately.
 """
 
 
@@ -126,6 +127,7 @@ Top ranked articles:
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.6,
+                response_format={"type": "json_object"}
             )
 
             raw_text = response.choices[0].message.content

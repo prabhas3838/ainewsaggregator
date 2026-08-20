@@ -28,6 +28,7 @@ STRICT RULES:
 - Output MUST be valid JSON only
 - Do NOT include explanations, markdown, or extra text
 - Do NOT wrap output in code blocks
+- CRITICAL: DO NOT output any reasoning, chain of thought, or <think> tags. Output ONLY the raw JSON immediately.
 
 JSON schema:
 {
@@ -63,6 +64,7 @@ class DigestAgent:
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.7,
+                response_format={"type": "json_object"}
             )
 
             raw_text = response.choices[0].message.content
