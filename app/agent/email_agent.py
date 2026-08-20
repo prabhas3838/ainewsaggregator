@@ -86,7 +86,7 @@ def extract_json(text: str) -> dict:
 class EmailAgent:
     def __init__(self, user_profile: dict):
         self.client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-        self.model = "llama-3.1-8b-instant"
+        self.model = "llama3-8b-8192"
         self.user_profile = user_profile
 
     def generate_introduction(
