@@ -67,11 +67,16 @@ class DigestAgent:
 
             raw_text = response.choices[0].message.content
 
-            # Parse JSON safely
-            data = json.loads(raw_text)
+            # Parse JSON safely using regex to strip out conversational fluff/markdown
+            import re
+            match = re.search(r"\{.*\}", raw_text, re.DOTALL)
+            if not match:
+                raise ValueError("No JSON object found in model output")
+            
+            data = json.loads(match.group())
             return DigestOutput(**data)
 
-        except (json.JSONDecodeError, ValidationError) as e:
+        except (json.JSONDecodeError, ValidationError, ValueError) as e:
             print("Failed to parse model output:", e)
             return None
         except Exception as e:
