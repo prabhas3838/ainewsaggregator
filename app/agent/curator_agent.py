@@ -32,10 +32,10 @@ STRICT RULES:
 - Do NOT wrap output in code blocks
 
 SCORING RULES (MANDATORY):
-- relevance_score is an INTEGER from 1 to 10
-- 10 = highest relevance
+- relevance_score is an INTEGER from 1 to 100
+- 100 = highest relevance
 - 1 = lowest relevance
-- Rank 1 MUST have relevance_score = 10
+- Rank 1 MUST have relevance_score = 100
 - Scores MUST strictly decrease as rank increases
 - No two articles may share the same relevance_score
 
