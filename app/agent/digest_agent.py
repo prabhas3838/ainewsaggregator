@@ -63,7 +63,6 @@ class DigestAgent:
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.7,
-                response_format={"type": "json_object"}
             )
 
             raw_text = response.choices[0].message.content
